@@ -1,5 +1,18 @@
-# Paper Search Tool Based On Selenium 
-**Version:** V-1.0
+# 基于爬虫的CCF A类顶会和期刊论文自动搜索工具  
+#### 用法
 
-**Description:** Used to search some paper in the CCF A conference or journal. 
+- 指定`task_dict`
 
+#### 后续添加功能
+
+- 多关键字搜索功能
+- 
+
+# Automatic Search of CCF A Papers Based On Web Crawler
+
+#### Usage
+
+#### ToDoList
+
+- Multi-key based search
+- 
