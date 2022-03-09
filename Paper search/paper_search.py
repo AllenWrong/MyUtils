@@ -1,21 +1,7 @@
 import time
 import os
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-import csv
-
-
-def get_browser(url):
-    # 不要打开浏览器
-    options = webdriver.ChromeOptions()
-    options.add_argument('--headless')
-    options.add_argument('--no-sanbox')
-
-    # 创建WebDriver对象
-    browser = webdriver.Chrome()
-    # 调用WebDriver对象的get()方法发起请求
-    browser.get(url)
-    return browser
+import requests
+from bs4 import BeautifulSoup
 
 
 def has_key(paper_name, keys):
@@ -27,59 +13,60 @@ def has_key(paper_name, keys):
 
 def write_to_file(content, file):
     # 数据的存储文件，可能比较费时
-    if os.path.exists(file):
-        os.remove(file)
-    else:
-        f = open(file, "a")
-        print(content, file=f)
-        f.close()
+    f = open(file, "a+")
+    print(content, file=f)
+    f.close()
 
 
-def download_data(browser, save_file, paper_src, type, keys):
+def get_data(url, paper_src, type, keys):
     """
-    Args:
-        browser:
-        save_file:
-        paper_src: 论文出处，如CVPR
-        type: conference or journal
-        keys: 关键字
+    use beautifulsoup to parse data.
     """
 
     start_time = time.time()
+
+    page = requests.get(url).text
+    soup = BeautifulSoup(page, "html.parser")
+    if type == "C":
+        lists = soup.find_all(name="li", attrs={"class": "entry inproceedings"})
+    else:
+        lists = soup.find_all(name="li", attrs={"class": "entry article"})
+
     paper_num = 0
-    try:
-        if type == "C":
-            lists = browser.find_elements(By.CLASS_NAME, value="entry.inproceedings")
-        else:
-            lists = browser.find_elements(By.CLASS_NAME, value="entry.article")
+    for li in lists:
+        title = li.find(name="span", attrs={"class":"title"}).text
+        if has_key(title, keys):
+            paper_num += 1
+            write_to_file(paper_src + "," + title, save_file)
 
-        for li in lists:
-            paper_name = li.find_element(By.CLASS_NAME, value="title")
-            if has_key(paper_name.text, keys):
-                paper_num += 1
-                write_to_file(paper_src + "," + paper_name.text, save_file)
-
-    except Exception as e:
-        print(e)
-    finally:
-        end_time = time.time()
-        time_used = end_time - start_time
-        print(f"Search in {paper_src}, get paper number {paper_num},  time used: {time_used:.4}s.")
-        browser.refresh()
+    end_time = time.time()
+    time_used = end_time - start_time
+    print(f"Search in {paper_src}, get {paper_num} papers,  time used: {time_used:.4}s.")
 
 
 def get_url_entity(file):
-    entity_list = []
     with open(file, mode='r') as f:
-        reader = csv.reader(f)
-        entity_list.append((rows[0], rows[1], rows[2]) for rows in reader)
+        lines = f.readlines()
+        entity_list = [tuple(line.replace("\n", "").split(",")) for line in lines]
 
     return entity_list
 
 
 if __name__ == '__main__':
     urls = get_url_entity("./A_paper_sets.csv")
-    keys = ["contrastive"]
 
-    for paper_src, paper_url, type in urls:
-        download_data(get_browser(paper_url), "./papers.csv", paper_src, type, keys)
+    # keys dict
+    task_dict = {
+        'multi-modal-papers': ["multi view", "mutli-view", "multi modal", 'multi-modal'],
+        'trustworthy-papers': ["trust", "reliable"],
+        'recommend': ["recommend"]
+    }
+
+    for task, keys in task_dict.items():
+        save_file = "./" + task + ".csv"
+        if os.path.exists(save_file):
+            os.remove(save_file)
+
+        print(f" ---- Task: {task} ---- ")
+        for paper_src, paper_url, type in urls:
+            get_data(paper_url, paper_src, type, keys)
