@@ -4,11 +4,19 @@ import requests
 from bs4 import BeautifulSoup
 
 
-def has_key(paper_name, keys):
+def has_key(paper_name, keys, logic="and"):
     for key in keys:
-        if paper_name.lower().find(key.lower()) != -1:
+        if logic == "and":
+            for k in key:
+                if paper_name.lower().find(k.lower()) == -1:
+                    return False
             return True
-    return False
+        # else:
+        #     for k in key:
+        #         if paper_name.lower().find(k.lower()) != -1:
+        #             return True
+
+            # return False
 
 
 def write_to_file(content, file):
@@ -18,7 +26,7 @@ def write_to_file(content, file):
     f.close()
 
 
-def get_data(url, paper_src, type, keys):
+def get_data(url, paper_src, type, keys, logic):
     """
     use beautifulsoup to parse data.
     """
@@ -35,7 +43,7 @@ def get_data(url, paper_src, type, keys):
     paper_num = 0
     for li in lists:
         title = li.find(name="span", attrs={"class":"title"}).text
-        if has_key(title, keys):
+        if has_key(title, keys, logic):
             paper_num += 1
             write_to_file(paper_src + "," + title, save_file)
 
@@ -57,9 +65,10 @@ if __name__ == '__main__':
 
     # keys dict
     task_dict = {
-        'multi-modal-papers': ["multi view", "mutli-view", "multi modal", 'multi-modal'],
-        'trustworthy-papers': ["trust", "reliable"],
-        'recommend': ["recommend"]
+        # 'multi-modal-papers': ["multi view", "mutli-view", "multi modal", 'multi-modal'],
+        # 'trustworthy-papers': ["trust", "reliable"],
+        # 'recommend': ["recommend"]
+        "multi-view-incomplete": [["incomplete"]]
     }
 
     for task, keys in task_dict.items():
@@ -69,4 +78,4 @@ if __name__ == '__main__':
 
         print(f" ---- Task: {task} ---- ")
         for paper_src, paper_url, type in urls:
-            get_data(paper_url, paper_src, type, keys)
+            get_data(paper_url, paper_src, type, keys, "and")
