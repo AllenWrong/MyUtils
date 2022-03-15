@@ -42,7 +42,8 @@ def get_data(url, paper_src, type, keys, logic):
 
     paper_num = 0
     for li in lists:
-        title = li.find(name="span", attrs={"class":"title"}).text
+        # avoid the ',' in content be parsed by csv
+        title = '"' + li.find(name="span", attrs={"class":"title"}).text + '"'
         if has_key(title, keys, logic):
             paper_num += 1
             write_to_file(paper_src + "," + title, save_file)
