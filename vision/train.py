@@ -46,9 +46,6 @@ def train(model, optimizer, loss_fn, dataloader, metrics, params):
             if params.cuda:
                 train_batch = train_batch.cuda(non_blocking=True)
                 labels_batch = labels_batch.cuda(non_blocking=True)
-            # convert to torch Variables
-            # train_batch, labels_batch = Variable(
-            #     train_batch), Variable(labels_batch)
 
             # compute model output and loss
             output_batch = model(train_batch)
@@ -121,8 +118,8 @@ def train_and_evaluate(model, train_dataloader, val_dataloader, optimizer, loss_
 
         end_time = time.time()
         epoch_time = end_time - start_time
-        logging.info(f"- Used time: {epoch_time/60:.4f}m, "
-                     f"estimated remaining time {epoch_time * (params.num_epochs-epoch-1)/60/60:.4}h")
+        print(f"- Used time: {epoch_time/60:.4f}m, "
+              f"estimated remaining time {epoch_time * (params.num_epochs-epoch-1)/60/60:.4}h")
 
         # May be other metrics
         val_acc = val_metrics['accuracy']
@@ -156,7 +153,8 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--data_dir', default='data',
-                        help="Directory containing the dataset")
+                        help="Path of data")
+    parset.add_argument('--data', default='mnist', help='Name of data.')
     parser.add_argument('--model_dir', default='experiments/base_model',
                         help="Directory containing params.json")
     parser.add_argument('--restore_file', default=None,
@@ -184,38 +182,14 @@ if __name__ == '__main__':
     utils.set_logger(os.path.join(args.model_dir, 'train.log'))
 
     # ---- Create the input data pipeline ----
-    logging.info("Loading the datasets...")
+    logging.info(f"Loading the datasets {args.data}...")
 
     # fetch dataloaders
-    # dataloaders = data_loader.fetch_dataloader(
-    #     ['train', 'val'], args.data_dir, params
-    # )
-    train_set = torchvision.datasets.MNIST(
-        "./data",
-        train=True,
-        download=True,
-        transform=torchvision.transforms.Compose([
-            torchvision.transforms.ToTensor(),
-            torchvision.transforms.Resize(224)
-        ])
+    dataloaders = data_loader.fetch_dataloader(
+        ['train', 'val'], args.data_dir, params
     )
-    test_set = torchvision.datasets.MNIST(
-        "./data",
-        train=False,
-        download=True,
-        transform=torchvision.transforms.Compose([
-            torchvision.transforms.ToTensor(),
-            torchvision.transforms.Resize(224)
-        ])
-    )
-
-    # train_loader = dataloaders['train']
-    # val_loader = dataloaders['val']
-    val_size = int(len(train_set) * 0.1)
-    train_size = len(train_set) - val_size
-    train_set, val_set = torch.utils.data.random_split(train_set, lengths=[train_size, val_size])
-    train_loader = DataLoader(train_set, params.batch_size, shuffle=True, drop_last=True, pin_memory=params.cuda)
-    val_loader = DataLoader(val_set, params.batch_size, pin_memory=params.cuda)
+    train_loader = dataloaders['train']
+    val_loader = dataloaders['val']
 
     logging.info("- done.")
 

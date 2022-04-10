@@ -151,3 +151,21 @@ def load_checkpoint(checkpoint, model, optimizer=None):
         optimizer.load_state_dict(checkpoint['optim_dict'])
 
     # return checkpoint
+
+
+def show_scatter(feature, y, method="tsne"):
+    """
+    Args:
+        feature (np.ndarray): shape is (num_sample, feature_dim)
+        y (np.ndarray): shape if (num_sample,)
+        method (str): pca or t-sne
+    """
+    if method == "pca":
+        pca = PCA(n_components=2)
+        reduced_feature = pca.fit_transform(feature)
+    else:
+        tsne = TSNE(n_components=2, perplexity=80, random_state=230, init="pca", learning_rate=200, metric="cosine")
+        reduced_feature = tsne.fit_transform(feature)
+    fig = plt.figure(figsize=(10, 8))
+    plt.scatter(x=reduced_feature[:, 0], y=reduced_feature[:, 1], c=y, s=8)
+    return fig
