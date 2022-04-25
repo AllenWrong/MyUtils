@@ -26,7 +26,7 @@ def has_key(paper_name, keys):
 def write_to_file(content, file):
     # 数据的存储文件，可能比较费时
     f = open(file, "a+", encoding="utf-8")
-    print(content, file=f)
+    f.write(content)
     f.close()
 
 
@@ -45,13 +45,15 @@ def get_data(url, paper_src, type, keys):
         lists = soup.find_all(name="li", attrs={"class": "entry article"})
 
     paper_num = 0
+    papers_str = ""
     for li in lists:
         # avoid the ',' in content be parsed by csv
-        title = '"' + li.find(name="span", attrs={"class":"title"}).text + '"'
+        title = li.find(name="span", attrs={"class":"title"}).text
         if has_key(title, keys):
             paper_num += 1
-            write_to_file(paper_src + "," + title, save_file)
+            papers_str += "|" + paper_src + "|" + title + "|\n"
 
+    write_to_file(papers_str, save_file)
     end_time = time.time()
     time_used = end_time - start_time
     print(f"Search in {paper_src}, get {paper_num} papers,  time used: {time_used:.4}s.")
@@ -88,21 +90,26 @@ if __name__ == '__main__':
         #                           ['multi-modal', "cluster"],
         #                           ["multiview", "cluster"],
         #                           ["multimodal", "cluster"]]
-        "multi-view-classification": [["multi view", "classification"],
-                               ["multi-view", "classification"],
-                               ["multi modal", "classification"],
-                               ['multi-modal', "classification"],
-                               ["multiview", "classification"],
-                               ["multimodal", "classification"]],
-        "Federated-Learning": ["Federated Learning"]
+        # "multi-view-classification": [["multi view", "classification"],
+        #                        ["multi-view", "classification"],
+        #                        ["multi modal", "classification"],
+        #                        ['multi-modal', "classification"],
+        #                        ["multiview", "classification"],
+        #                        ["multimodal", "classification"]],
+        # "Federated-Learning": ["Federated Learning"]
+        # "Feature-Augmentation": [["feature", "augmentation"]]
+        "enegy-based-model": ["energy"]
 
     }
 
     for task, keys in task_dict.items():
-        save_file = "./" + task + ".csv"
+        save_file = "./" + task + ".md"
         if os.path.exists(save_file):
             os.remove(save_file)
 
+        header = "| 会议/期刊 | 论文 |\n| ---- | ---- |\n"
+        with open(save_file, "w") as f:
+            f.write(header)
         print(f" ---- Task: {task} ---- ")
         for paper_src, paper_url, type in urls:
             get_data(paper_url, paper_src, type, keys)
