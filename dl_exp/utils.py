@@ -105,7 +105,7 @@ class Bank:
             for i in range(len(it)):
                 self._append(i, it[i])
         else:
-            raise ValueError(f"unsupported type {type(it)}")
+            self.bank.append(self._to_bank_type(it))
         
     def concat(self, axis=0):
         if self.it_num == 0:
