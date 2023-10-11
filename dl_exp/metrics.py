@@ -3,7 +3,29 @@ from scipy.optimize import linear_sum_assignment
 import numpy as np
 
 
-def cluster_acc(y_true: np.ndarray, y_pred: np.ndarray):
+def clf_acc(y_true: np.ndarray, y_pred: np.ndarray) -> float:
+    """return clf acc
+
+    Args:
+        y_true (np.ndarray): 
+        y_pred (np.ndarray):
+
+    Returns:
+        float: acc value
+    """
+    return accuracy_score(y_true, y_pred)
+
+
+def cluster_acc(y_true: np.ndarray, y_pred: np.ndarray) -> float:
+    """return cluster acc
+
+    Args:
+        y_true (np.ndarray): 
+        y_pred (np.ndarray):
+
+    Returns:
+        float: acc value
+    """
     y_true = y_true.reshape(-1)
     y_pred = y_pred.reshape(-1)
 
@@ -18,7 +40,16 @@ def cluster_acc(y_true: np.ndarray, y_pred: np.ndarray):
     return sum([w[i, j] for i, j in ind]) * 1.0 / y_pred.size
 
 
-def purity(y_true: np.ndarray, y_pred: np.ndarray):
+def purity(y_true: np.ndarray, y_pred: np.ndarray) -> float:
+    """purity
+
+    Args:
+        y_true (np.ndarray): 
+        y_pred (np.ndarray): 
+
+    Returns:
+        float: pur value
+    """
     y_true = y_true.reshape(-1)
     y_pred = y_pred.reshape(-1)
     
@@ -38,7 +69,16 @@ def purity(y_true: np.ndarray, y_pred: np.ndarray):
     return accuracy_score(y_true, y_voted_labels)
 
 
-def nmi(y_true: np.ndarray, y_pred: np.ndarray):
+def nmi(y_true: np.ndarray, y_pred: np.ndarray) -> float:
+    """nmi
+
+    Args:
+        y_true (np.ndarray): 
+        y_pred (np.ndarray): 
+
+    Returns:
+        float: nmi value
+    """
     y_true = y_true.reshape(-1)
     y_pred = y_pred.reshape(-1)
     return normalized_mutual_info_score(y_true, y_pred)

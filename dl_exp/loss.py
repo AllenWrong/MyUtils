@@ -19,9 +19,6 @@ def soft_contrastive_loss(zs, ema_zs, tau=1.0, soft=False):
             sim_z = (a @ b.T) / tau
             if soft:
                 sim_ema = (F.normalize(ema_zs[v], dim=-1) @ F.normalize(ema_zs[u], dim=-1).T) / 10
-                # thresh = sim_ema.median().item() * 0.75
-                # sim_ema[sim_ema < thresh] = 0
-                # loss += fn.forward(sim_z, sim_ema)
                 loss += log_softmax(sim_z, sim_ema)
             else:
                 loss += fn.forward(sim_z, torch.arange(0, sim_z.shape[0], device=sim_z.device))
@@ -33,7 +30,14 @@ def soft_contrastive_loss(zs, ema_zs, tau=1.0, soft=False):
 class DDCLoss(nn.Module):
     """Adopted from https://github.com/Gasteinh/DSMVC/blob/main/loss.py"""
 
-    def __init__(self, batch_size, class_num, device):
+    def __init__(self, batch_size: int, class_num: int, device: str):
+        """Devergence Based Loss
+
+        Args:
+            batch_size (int):
+            class_num (int):
+            device (str): 'cpu' or 'cuda' or 'cuda:x'
+        """
         super(DDCLoss, self).__init__()
         self.batch_size = batch_size
         self.class_num = class_num
