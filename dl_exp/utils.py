@@ -114,6 +114,26 @@ def plot_mv_emb(
         plot(mv_emb[i], label, save_path)
 
 
+class History:
+    def __init__(self) -> None:
+        self._data = []
+
+    def append(self, item):
+        if isinstance(item, torch.Tensor):
+            self._data.append(item.item())
+        elif isinstance(item, np.ndarray):
+            self._data.append(item[0])
+        elif isinstance(item, float):
+            self._data.append(item)
+        else:
+            raise TypeError(f"Unsupported type: {type(item)}")
+
+    def plot(self, save_path):
+        plt.plot(list(range(len(self._data))), self._data)
+        plt.savefig(save_path)
+        plt.show()
+
+
 class Bank:
     """A data bank. When you want to collect the output or data of each batch, you
     will need this class. Finaly, by call `concat`you can get the concated result.
