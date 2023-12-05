@@ -3,7 +3,7 @@ import json
 
 
 def get_remote_txt(address, parse_fn=None):
-    """get remove txt file and use parse_fn to parse content."""
+    """get remove .txt file and use parse_fn to parse content."""
     response = requests.get(address)
     if response.status_code == 200:
         if parse_fn is not None:
