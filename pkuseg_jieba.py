@@ -4,11 +4,14 @@ import jieba
 
 
 class Pkuseg(pkuseg.pkuseg):
-    """自定义化的pkuseg类，以支持和jieba.cut同等格式的输出"""
+    """Customed pkuseg class. Custom the output of this class to be
+    same as the jieba.cut interface.
+    """
     def __init__(self, model_name="default", user_dict="default", postag=False):
         super().__init__(model_name, user_dict, postag)
     
     def cut(self, text):
+        """Custom the output of this method to be same as the jieba.cut method."""
         res = super().cut(text)
         if len(res) > 0 and isinstance(res[0], tuple):
             res = [jieba.posseg.pair(*it) for it in res]
@@ -16,7 +19,10 @@ class Pkuseg(pkuseg.pkuseg):
 
 
 class CustomTFIDF(JiebaTFIDF):
-    """自定义的tfidf类，继承自jieba的TFIDF类，以支持pkuseg的分词工具。单例模式"""
+    """Customed TFIDF class. Inherited from jieba.analyse.tfidf.TFIDF.
+    This class can support the pukseg word cutting api. This class is
+    implemented with single instance mode.
+    """
     _instance = None
 
     def __new__(cls, *args, **kwargs):
@@ -25,6 +31,7 @@ class CustomTFIDF(JiebaTFIDF):
         return cls._instance
     
     def __init__(self, use_pkuseg=True, idf_path=None):
+        """Custom this class to suppoer the pkuseg word cutting api."""
         super().__init__(idf_path=idf_path)
         if use_pkuseg:
             self.tokenizer = Pkuseg()
