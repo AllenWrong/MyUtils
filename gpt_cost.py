@@ -48,6 +48,7 @@ def tot_cost_by_docs(docs: list, request_type: str, model_name: str):
     token_num = num_tokens(docs, model_name)
     return price_per_token(model_name)[request_type] * token_num
 
+
 def tot_cost_by_token_num(token_num: int, request_type: str, model_name: str):
     """
     compute the cost when you know the number of token.
