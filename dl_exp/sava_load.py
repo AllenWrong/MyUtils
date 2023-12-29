@@ -29,13 +29,17 @@ def save_torch_model(model_state, opt_state, sched_state, path_dir, cfg: dict):
 
 def load_torch_model(model: nn.Module, opt, sched, path_dir) -> dict:
     """load state and return checkpoint config"""
+    info = f'[info] loaded from {path_dir}, for model'
     model.load_state_dict(torch.load(os.path.join(path_dir, 'model.pth')))
+
     if opt is not None:
         opt.load_state_dict(torch.load(os.path.join(path_dir, 'opt.pth')))
+        info += ', for opt'
     if sched is not None:
         sched.load_state_dict(torch.load(os.path.join(path_dir, 'sched.pth')))
+        info += ', for sched'
 
     with open(os.path.join(path_dir, 'config.json'), 'r') as f:
         config = json.load(f)
-    print(f'loaded from {path_dir}')
+    print(info)
     return config
