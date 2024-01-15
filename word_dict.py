@@ -71,6 +71,7 @@ class WordDict:
         return eval(x)
     
     def collect(self, datas_path, col_name, from_date=None, need_eval=False):
+        """not necessary"""
         tmp_items = list(Path(datas_path).glob('*.tsv'))
         # 过滤不需要处理的日期数据
         items = []
