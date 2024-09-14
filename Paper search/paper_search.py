@@ -98,7 +98,8 @@ if __name__ == '__main__':
         #                        ["multimodal", "classification"]],
         # "Federated-Learning": ["Federated Learning"]
         # "Feature-Augmentation": [["feature", "augmentation"]]
-        "enegy-based-model": ["energy"]
+        # "enegy-based-model": ["energy"]
+        "news-recomend": ["News Recommendation"]
 
     }
 
