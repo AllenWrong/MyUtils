@@ -27,3 +27,4 @@ def save_sk_model(model, file_path):
 def load_sk_model(file_path):
     with open(file_path, 'rb') as f:
         return pickle.load(f)
+
